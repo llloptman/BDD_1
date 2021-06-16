@@ -31,7 +31,7 @@ class MoneyTransferTest {
     }
 
     @Test
-    void shouldTransferMoneyBetweenOwnCards1_2(){
+    void shouldTransferMoneyBetweenOwnCards1_2() {
         val dashboardPage = new DashboardPage();
 
         //Перевод 500 рублей с первой карты на вторую
@@ -39,11 +39,11 @@ class MoneyTransferTest {
         int secondCardStartBalance = dashboardPage.getSecondCardBalance();
         val refillPage1 = dashboardPage.refillFirstCard();
         refillPage1.setForm(500, secondCard.getCardNumber());
-        assertEquals(Math.abs(firstCardStartBalance + 500),Math.abs(dashboardPage.getFirstCardBalance()));
-        assertEquals(Math.abs(secondCardStartBalance - 500),Math.abs(dashboardPage.getSecondCardBalance()));
+        refillPage1.checkBalance(firstCardStartBalance, secondCardStartBalance, 500, secondCard.getCardNumber());
     }
+
     @Test
-    void shouldTransferMoneyBetweenOwnCards2_1(){
+    void shouldTransferMoneyBetweenOwnCards2_1() {
         val dashboardPage = new DashboardPage();
 
         //Перевод 1000 рублей со второй карты на первую
@@ -51,27 +51,28 @@ class MoneyTransferTest {
         int secondCardStartBalance = dashboardPage.getSecondCardBalance();
         val refillPage2 = dashboardPage.refillSecondCard();
         refillPage2.setForm(1000, firstCard.getCardNumber());
-        assertEquals(Math.abs(firstCardStartBalance - 1000),Math.abs(dashboardPage.getFirstCardBalance()));
-        assertEquals(Math.abs(secondCardStartBalance + 1000),Math.abs(dashboardPage.getSecondCardBalance()));
+        refillPage2.checkBalance(firstCardStartBalance, secondCardStartBalance, 1000, firstCard.getCardNumber());
     }
+
     @Test
-    void shouldntTransferFromOtherCard(){
+    void shouldntTransferFromOtherCard() {
         val dashboardPage = new DashboardPage();
         int firstCardStartBalance = dashboardPage.getFirstCardBalance();
         int secondCardStartBalance = dashboardPage.getSecondCardBalance();
         val refillPage2 = dashboardPage.refillSecondCard();
         refillPage2.setFormForErrors(1000, invalidCard.getCardNumber());
-        refillPage2.getErrorMessage().shouldBe(Condition.visible, Duration.ofSeconds(5));
     }
+
     @Test
-    void shouldntTransferMoreThenBalance(){
+    void shouldntTransferMoreThenBalance() {
         val dashboardPage = new DashboardPage();
         int firstCardStartBalance = dashboardPage.getFirstCardBalance();
         int secondCardStartBalance = dashboardPage.getSecondCardBalance();
         val refillPage2 = dashboardPage.refillSecondCard();
         refillPage2.setForm(firstCardStartBalance + 1000, firstCard.getCardNumber());
-        refillPage2.getErrorMessage().shouldBe(Condition.visible, Duration.ofSeconds(5));
+        refillPage2.checkBalance(firstCardStartBalance, secondCardStartBalance, firstCardStartBalance + 1000, firstCard.getCardNumber());
     }
+
     @Test
     void shouldTransferMoneyWithKopek() {
         val dashboardPage = new DashboardPage();
@@ -80,9 +81,8 @@ class MoneyTransferTest {
         int firstCardStartBalance = dashboardPage.getFirstCardBalance();
         int secondCardStartBalance = dashboardPage.getSecondCardBalance();
         val refillPage1 = dashboardPage.refillFirstCard();
-        refillPage1.setForm(500.51, secondCard.getCardNumber());
-        assertEquals(Math.abs(firstCardStartBalance + 500.51),Math.abs(dashboardPage.getFirstCardBalance()));
-        assertEquals(Math.abs(secondCardStartBalance - 500.51),Math.abs(dashboardPage.getSecondCardBalance()));
+        refillPage1.setForm(5.51, secondCard.getCardNumber());
+        refillPage1.checkBalance(firstCardStartBalance, secondCardStartBalance, 5.51, secondCard.getCardNumber());
     }
 
     @AfterEach
